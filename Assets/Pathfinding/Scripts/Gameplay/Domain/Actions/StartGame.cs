@@ -1,32 +1,18 @@
 using Pathfinding.Scripts.Gameplay.Domain.Services;
 using Pathfinding.Scripts.Gameplay.Domain.ValueObjects;
-using static Pathfinding.Scripts.Gameplay.Domain.ValueObjects.HexaTile;
 
 namespace Pathfinding.Scripts.Gameplay.Domain.Actions
 {
     public class StartGame
     {
-        readonly RandomTileService randomTileService;
+        readonly GridService gridService;
 
-        public StartGame(RandomTileService randomTileService)
+        public StartGame(GridService gridService)
         {
-            this.randomTileService = randomTileService;
+            this.gridService = gridService;
         }
 
-        public HexaTile[,] Do(int gridRows, int gridCols)
-        {
-            var grid = new HexaTile[gridRows, gridCols];
-            
-            for (var y = 0; y < gridRows; y++)
-            {
-                for (var x = 0; x < gridCols; x++)
-                {
-                    var hexaTile = randomTileService.PickOne();
-                    grid[x, y] = SetTileInCoordinates(hexaTile, x, y);
-                }
-            }
-
-            return grid;
-        }
+        public HexaTile[,] Do(int gridRows, int gridCols) => 
+            gridService.Create(gridRows, gridCols);
     }
 }

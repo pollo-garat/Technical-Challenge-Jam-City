@@ -1,7 +1,7 @@
 using NSubstitute;
 using NUnit.Framework;
 using Pathfinding.Scripts.Gameplay.Domain.Actions;
-using Pathfinding.Scripts.Gameplay.Domain.ValueObjects;
+using Pathfinding.Scripts.Gameplay.Domain.Services;
 using static Pathfinding.Scripts.Gameplay.Tests.Mothers.HexaTileMother;
 using static Pathfinding.Scripts.Gameplay.Tests.Mothers.RandomServiceMother;
 
@@ -13,7 +13,8 @@ namespace Pathfinding.Scripts.Gameplay.Tests
         [Test]
         public void CreateAGridFullOfTiles()
         {
-            var startGameAction = new StartGame(ARandomTileService());
+            var gridService = new GridService(ARandomTileService());
+            var startGameAction = new StartGame(gridService);
             var gridCols = 3;
             var gridRows = 3;
             var expectedGrid = new[,]
@@ -32,7 +33,7 @@ namespace Pathfinding.Scripts.Gameplay.Tests
         public void RandomTileServiceIsCalled()
         {
             var randomService = ARandomTileService();
-            var startGameAction = new StartGame(randomService);
+            var startGameAction = new StartGame(new GridService(randomService));
             var gridCols = 3;
             var gridRows = 3;
 
