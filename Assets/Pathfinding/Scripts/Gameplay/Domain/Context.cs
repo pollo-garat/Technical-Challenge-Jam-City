@@ -2,14 +2,14 @@ using Pathfinding.Scripts.Gameplay.Domain.Actions;
 using Pathfinding.Scripts.Gameplay.Domain.Infrastructure;
 using Pathfinding.Scripts.Gameplay.Domain.Services;
 using Pathfinding.Scripts.Gameplay.Domain.ValueObjects;
+using Pathfinding.Scripts.Gameplay.Domain.Views;
 using UnityEngine;
 
 namespace Pathfinding.Scripts.Gameplay.Domain
 {
     public class Context : MonoBehaviour
     {
-        public int GridRows;
-        public int GridCols;
+        public WorldGrid WorldGrid;
         
         void Start()
         {
@@ -29,12 +29,11 @@ namespace Pathfinding.Scripts.Gameplay.Domain
             var gridService = new GridService(randomTileService);
             var startGame = new StartGame(gridService);
 
-            var result = startGame.Do(GridRows, GridCols);
-
-            foreach (var tile in result)
-            {
-                Debug.Log($"{tile.ToString()}");
-            }
+            WorldGrid.Initialize();
+            
+            var domainGrid = startGame.Do(WorldGrid.GridWidth, WorldGrid.GridHeight);
+            
+            WorldGrid.Create(domainGrid);
         }
     }
 }
