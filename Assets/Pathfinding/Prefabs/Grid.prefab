@@ -43,7 +43,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbdfebad9ab6848dda3a5ad236b4beec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HexPrefab: {fileID: 919132149155446097, guid: 296000b24efb747a291841005a6fd659, type: 3}
+  HexPrefab: {fileID: 7025463752417707341, guid: 098382689e51b4597951ee0175d9450a, type: 3}
   GridWidth: 8
   GridHeight: 8
   Gap: 0.1
+  GrassMaterial: {fileID: 2100000, guid: 8a49cd32459f145a4815a6a88553a38f, type: 2}
+  ForestMaterial: {fileID: 2100000, guid: 5e4d259c8099549ae95ac475fdaa8816, type: 2}
+  DesertMaterial: {fileID: 2100000, guid: f0a2eee800e234de2aa89adae08ab2e7, type: 2}
+  MountainMaterial: {fileID: 2100000, guid: 37e8cce754be44669b5c8398aa29f3d6, type: 2}
+  WaterMaterial: {fileID: 2100000, guid: 96740d32a71494b75aa81bfddef3e089, type: 2}

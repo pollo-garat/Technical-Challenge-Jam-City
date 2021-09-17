@@ -9,12 +9,18 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
         public int GridWidth;
         public int GridHeight;
         public float Gap;
- 
+
+        public Material GrassMaterial;
+        public Material ForestMaterial;
+        public Material DesertMaterial;
+        public Material MountainMaterial;
+        public Material WaterMaterial;
+        
         float hexWidth = 1f;
         float hexHeight = 1f;
  
         Vector3 startPos;
- 
+
         public void Initialize()
         {
             AddGap();
@@ -29,9 +35,21 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
                 var gridPos = new Vector2(tile.X, tile.Y);
                 hex.transform.position = CalculateWorldPosition(gridPos);
                 hex.name = "Hexagon" + tile.X + "|" + tile.Y;
+                SetTileMaterial(tile.Configuration.Type);
             }
         }
- 
+
+        void SetTileMaterial(TileType type) =>
+            HexPrefab.GetComponentInChildren<MeshRenderer>().material = type switch
+            {
+                TileType.Grass => GrassMaterial,
+                TileType.Forest => ForestMaterial,
+                TileType.Desert => DesertMaterial,
+                TileType.Mountain => MountainMaterial,
+                TileType.Water => WaterMaterial,
+                _ => HexPrefab.GetComponent<MeshRenderer>().material
+            };
+
         void AddGap()
         {
             hexWidth += hexWidth * Gap;
