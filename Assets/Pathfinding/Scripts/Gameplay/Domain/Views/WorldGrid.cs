@@ -1,10 +1,16 @@
+using System;
 using Pathfinding.Scripts.Gameplay.Domain.ValueObjects;
+using UniRx;
 using UnityEngine;
 
 namespace Pathfinding.Scripts.Gameplay.Domain.Views
 {
     public class WorldGrid : MonoBehaviour
     {
+        public IObservable<HexaTileConfiguration> OnTileClicked => onTileClicked;
+        
+        readonly ISubject<HexaTileConfiguration> onTileClicked = new Subject<HexaTileConfiguration>();
+        
         public GameObject HexPrefab;
         public int GridWidth;
         public int GridHeight;
@@ -39,6 +45,8 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
                 hex.transform.position = CalculateWorldPosition(gridPosition);
                 hex.name = "Hexagon " + tile.X + "|" + tile.Y + " Type " + tile.Configuration.Type;
                 SetTileMaterial(hex, tile.Configuration.Type);
+
+                unityHexaTile.OnTileClicked.Subscribe(onTileClicked.OnNext);
             }
         }
 

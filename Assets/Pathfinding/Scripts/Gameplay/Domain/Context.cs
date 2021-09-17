@@ -3,6 +3,7 @@ using Pathfinding.Scripts.Gameplay.Domain.Infrastructure;
 using Pathfinding.Scripts.Gameplay.Domain.Services;
 using Pathfinding.Scripts.Gameplay.Domain.ValueObjects;
 using Pathfinding.Scripts.Gameplay.Domain.Views;
+using UniRx;
 using UnityEngine;
 
 namespace Pathfinding.Scripts.Gameplay.Domain
@@ -34,6 +35,9 @@ namespace Pathfinding.Scripts.Gameplay.Domain
             var domainGrid = startGame.Do(WorldGrid.GridWidth, WorldGrid.GridHeight);
 
             WorldGrid.Create(domainGrid);
+
+            WorldGrid.OnTileClicked
+                .Subscribe();
         }
     }
 }
