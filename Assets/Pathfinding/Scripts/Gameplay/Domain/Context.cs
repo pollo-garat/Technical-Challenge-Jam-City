@@ -30,9 +30,9 @@ namespace Pathfinding.Scripts.Gameplay.Domain
             var startGame = new StartGame(gridService);
 
             WorldGrid.Initialize();
-            
+
             var domainGrid = startGame.Do(WorldGrid.GridWidth, WorldGrid.GridHeight);
-            
+
             WorldGrid.Create(domainGrid);
         }
     }
