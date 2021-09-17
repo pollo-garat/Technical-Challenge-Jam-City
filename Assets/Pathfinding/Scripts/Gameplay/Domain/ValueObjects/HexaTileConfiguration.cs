@@ -12,6 +12,9 @@ namespace Pathfinding.Scripts.Gameplay.Domain.ValueObjects
             Cost = cost;
             IsWalkable = isWalkable;
         }
+
+        public override string ToString() => 
+            $"Type: {Type.ToString()} Cost: {Cost} IsWalkable {IsWalkable}";
     }
 
     public enum TileType

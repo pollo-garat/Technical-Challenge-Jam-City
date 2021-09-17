@@ -13,11 +13,18 @@ namespace Pathfinding.Scripts.Gameplay.Domain.ValueObjects
             Y = y;
         }
 
+        public HexaTile(HexaTileConfiguration configuration)
+        {
+            Configuration = configuration;
+            X = 0;
+            Y = 0;
+        }
+
         public static HexaTile SetTileInCoordinates(HexaTile tile, int x, int y) => 
             new HexaTile(tile.Configuration, x, y);
 
         public override string ToString() =>
-            $"Coordinate X: {X}, Coordinate Y: {Y}";
+            $"Configuration: {Configuration.ToString()} Coordinate X: {X}, Coordinate Y: {Y}";
         
         public override bool Equals(object obj) =>
             obj is HexaTile other && Equals(other);
