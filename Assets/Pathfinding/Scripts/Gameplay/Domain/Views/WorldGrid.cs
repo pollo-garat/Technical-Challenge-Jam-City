@@ -5,7 +5,7 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
 {
     public class WorldGrid : MonoBehaviour 
     {
-        public Transform HexPrefab;
+        public GameObject HexPrefab;
         public int GridWidth;
         public int GridHeight;
         public float Gap;
@@ -27,7 +27,7 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
             {
                 var hex = Instantiate(HexPrefab, transform, true);
                 var gridPos = new Vector2(tile.X, tile.Y);
-                hex.position = CalculateWorldPosition(gridPos);
+                hex.transform.position = CalculateWorldPosition(gridPos);
                 hex.name = "Hexagon" + tile.X + "|" + tile.Y;
             }
         }
