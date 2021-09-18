@@ -5,7 +5,7 @@ using Pathfinding.Scripts.Gameplay.Domain.Services;
 using static Pathfinding.Scripts.Gameplay.Tests.Mothers.HexaTileMother;
 using static Pathfinding.Scripts.Gameplay.Tests.Mothers.RandomServiceMother;
 
-namespace Pathfinding.Scripts.Gameplay.Tests
+namespace Pathfinding.Scripts.Gameplay.Tests.Actions
 {
     [TestFixture]
     public class StartGameTests
