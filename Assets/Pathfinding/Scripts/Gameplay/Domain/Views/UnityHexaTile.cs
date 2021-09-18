@@ -7,16 +7,14 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
 {
     public class UnityHexaTile : MonoBehaviour
     {
-        public IObservable<HexaTileConfiguration> OnTileClicked => onTileClicked;
+        public IObservable<HexaTile> OnTileClicked => onTileClicked;
 
-        HexaTileConfiguration hexaTileConfiguration;
-        readonly ISubject<HexaTileConfiguration> onTileClicked = new Subject<HexaTileConfiguration>();
+        HexaTile hexaTile;
+        readonly ISubject<HexaTile> onTileClicked = new Subject<HexaTile>();
 
-        public void SaveConfiguration(HexaTileConfiguration hexaTileConfiguration)
-        {
-            this.hexaTileConfiguration = hexaTileConfiguration;
-        }
+        public void Populate(HexaTile hexaTile) => 
+            this.hexaTile = hexaTile;
 
-        void OnMouseDown() => onTileClicked.OnNext(hexaTileConfiguration);
+        void OnMouseDown() => onTileClicked.OnNext(hexaTile);
     }
 }

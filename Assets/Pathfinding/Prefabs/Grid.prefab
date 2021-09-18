@@ -52,3 +52,5 @@ MonoBehaviour:
   DesertMaterial: {fileID: 2100000, guid: f0a2eee800e234de2aa89adae08ab2e7, type: 2}
   MountainMaterial: {fileID: 2100000, guid: 37e8cce754be44669b5c8398aa29f3d6, type: 2}
   WaterMaterial: {fileID: 2100000, guid: 96740d32a71494b75aa81bfddef3e089, type: 2}
+  NeighbourMaterial: {fileID: 2100000, guid: e1471f01d85524360bfdcc8d1ac443ff, type: 2}
+  DebugMode: 1

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Pathfinding.Scripts.Gameplay.Domain.ValueObjects;
 using UniRx;
 using UnityEngine;
@@ -7,9 +9,9 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
 {
     public class WorldGrid : MonoBehaviour
     {
-        public IObservable<HexaTileConfiguration> OnTileClicked => onTileClicked;
+        public IObservable<HexaTile> OnTileClicked => onTileClicked;
         
-        readonly ISubject<HexaTileConfiguration> onTileClicked = new Subject<HexaTileConfiguration>();
+        readonly ISubject<HexaTile> onTileClicked = new Subject<HexaTile>();
         
         public GameObject HexPrefab;
         public int GridWidth;
@@ -21,32 +23,49 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
         public Material DesertMaterial;
         public Material MountainMaterial;
         public Material WaterMaterial;
+        public Material NeighbourMaterial;
+
+        public bool DebugMode;
         
         float hexWidth = 1f;
         float hexHeight = 1f;
  
         Vector3 startPosition;
-        Material tileMaterial;
+        HexaTile[,] grid;
+        UnityHexaTile[,] unityGird;
 
-        public void Initialize()
+        public void CreateGrid(HexaTile[,] grid)
         {
+            this.grid = grid;
+            unityGird = new UnityHexaTile[GridWidth, GridHeight];
             AddGap();
             CalculateStartPosition();
+            Create();
         }
 
-        public void Create(HexaTile[,] grid)
+        void Create()
         {
             foreach (var tile in grid)
             {
                 var hex = Instantiate(HexPrefab, transform);
                 var gridPosition = new Vector2(tile.X, tile.Y);
                 var unityHexaTile = hex.GetComponent<UnityHexaTile>();
-                unityHexaTile.SaveConfiguration(tile.Configuration);
+                unityHexaTile.Populate(tile);
                 hex.transform.position = CalculateWorldPosition(gridPosition);
                 hex.name = "Hexagon " + tile.X + "|" + tile.Y + " Type " + tile.Configuration.Type;
                 SetTileMaterial(hex, tile.Configuration.Type);
+                unityGird[tile.X, tile.Y] = unityHexaTile;
 
                 unityHexaTile.OnTileClicked.Subscribe(onTileClicked.OnNext);
+            }
+        }
+
+        public void PaintNeighbours(IEnumerable<(int, int)> neighbours)
+        {
+            foreach (var neighbour in neighbours)
+            {
+                unityGird[neighbour.Item1, neighbour.Item2]
+                    .GetComponentInChildren<MeshRenderer>().sharedMaterial = NeighbourMaterial;
             }
         }
 
@@ -66,7 +85,7 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
             hexWidth += hexWidth * Gap;
             hexHeight += hexHeight * Gap;
         }
- 
+
         void CalculateStartPosition()
         {
             float offset = 0;
@@ -78,7 +97,7 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
  
             startPosition = new Vector3(x, 0, z);
         }
- 
+
         Vector3 CalculateWorldPosition(Vector2 gridPosition)
         {
             float offset = 0;

@@ -1,3 +1,4 @@
+using System.Linq;
 using Pathfinding.Scripts.Gameplay.Domain.Actions;
 using Pathfinding.Scripts.Gameplay.Domain.Infrastructure;
 using Pathfinding.Scripts.Gameplay.Domain.Services;
@@ -28,15 +29,21 @@ namespace Pathfinding.Scripts.Gameplay.Domain
                 WaterConfiguration
             );
             var gridService = new GridService(randomTileService);
+            var girdNeighbours = new GridNeighbours(WorldGrid.GridWidth, WorldGrid.GridHeight);
             var startGame = new StartGame(gridService);
-
-            WorldGrid.Initialize();
 
             var domainGrid = startGame.Do(WorldGrid.GridWidth, WorldGrid.GridHeight);
 
-            WorldGrid.Create(domainGrid);
+            WorldGrid.CreateGrid(domainGrid);
 
             WorldGrid.OnTileClicked
+                .Select(hexaTile => girdNeighbours.ValidNeighbours(hexaTile))
+                .Do(neighbours => Debug.Log(string.Join(" ", neighbours.Select(x => x.ToString()))))
+                .Do(neighbours =>
+                {
+                    if(WorldGrid.DebugMode)
+                        WorldGrid.PaintNeighbours(neighbours);
+                })
                 .Subscribe();
         }
     }
