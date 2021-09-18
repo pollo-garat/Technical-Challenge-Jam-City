@@ -62,23 +62,42 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
 
         public void PaintNeighbours(IEnumerable<(int, int)> neighbours)
         {
+            foreach (var unityTile in unityGird) 
+                unityTile.ResetMaterial();
+
             foreach (var neighbour in neighbours)
             {
                 unityGird[neighbour.Item1, neighbour.Item2]
-                    .GetComponentInChildren<MeshRenderer>().sharedMaterial = NeighbourMaterial;
+                    .GetComponent<UnityHexaTile>().SetNewMaterial(NeighbourMaterial);
             }
         }
 
-        void SetTileMaterial(GameObject hex, TileType type) =>
-            hex.GetComponentInChildren<MeshRenderer>().sharedMaterial = type switch
+        void SetTileMaterial(GameObject hex, TileType type)
+        {
+            var unityHexaTile = hex.GetComponent<UnityHexaTile>();
+            
+            switch (type)
             {
-                TileType.Grass => GrassMaterial,
-                TileType.Forest => ForestMaterial,
-                TileType.Desert => DesertMaterial,
-                TileType.Mountain => MountainMaterial,
-                TileType.Water => WaterMaterial,
-                _ => HexPrefab.GetComponent<MeshRenderer>().sharedMaterial
-            };
+                case TileType.Grass:
+                    unityHexaTile.SetInitialMaterial(GrassMaterial);
+                    break;
+                case TileType.Forest:
+                    unityHexaTile.SetInitialMaterial(ForestMaterial);
+                    break;
+                case TileType.Desert:
+                    unityHexaTile.SetInitialMaterial(DesertMaterial);
+                    break;
+                case TileType.Mountain:
+                    unityHexaTile.SetInitialMaterial(MountainMaterial);
+                    break;
+                case TileType.Water:
+                    unityHexaTile.SetInitialMaterial(WaterMaterial);
+                    break;
+                default:
+                    unityHexaTile.SetInitialMaterial(GrassMaterial);
+                    break;
+            }
+        }
 
         void AddGap()
         {
