@@ -1,20 +1,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using Pathfinding.Scripts.Gameplay.Domain.Repositories;
+using Pathfinding.Scripts.Gameplay.Domain.ValueObjects;
 
 namespace Pathfinding.Scripts.Gameplay.Domain.Infrastructure
 {
     public class InMemorySelectedTilesRepository : SelectedTilesRepository
     {
-        IEnumerable<(int, int)> selectedTiles;
+        IEnumerable<HexaTile> selectedTiles;
 
-        public InMemorySelectedTilesRepository(IEnumerable<(int, int)> selectedTiles = null) => 
-            this.selectedTiles = selectedTiles ?? Enumerable.Empty<(int, int)>();
+        public InMemorySelectedTilesRepository(IEnumerable<HexaTile> selectedTiles = null) => 
+            this.selectedTiles = selectedTiles ?? Enumerable.Empty<HexaTile>();
 
-        public IEnumerable<(int, int)> Load() => 
+        public IEnumerable<HexaTile> Load() => 
             selectedTiles;
 
-        public IEnumerable<(int, int)> Save(IEnumerable<(int, int)> selectedTiles) =>
+        public IEnumerable<HexaTile> Save(IEnumerable<HexaTile> selectedTiles) =>
             this.selectedTiles = selectedTiles;
     }
 }

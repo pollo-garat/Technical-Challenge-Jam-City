@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Pathfinding.Scripts.Gameplay.Domain.Repositories;
+using Pathfinding.Scripts.Gameplay.Domain.ValueObjects;
 
 namespace Pathfinding.Scripts.Gameplay.Domain.Actions
 {
@@ -11,12 +12,12 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Actions
         public SelectTiles(SelectedTilesRepository selectedTilesRepository) => 
             this.selectedTilesRepository = selectedTilesRepository;
 
-        public IEnumerable<(int, int)> Do((int, int) tileSelected) => 
-            selectedTilesRepository.Save(
-                LoadSelectedTiles().Concat(new[] {tileSelected})
-            );
+        public IEnumerable<HexaTile> Do(HexaTile tileSelected) => 
+            tileSelected.Type() != TileType.Water ? 
+                selectedTilesRepository.Save(LoadSelectedTiles().Concat(new[] {tileSelected})) : 
+                LoadSelectedTiles();
 
-        IEnumerable<(int, int)> LoadSelectedTiles() => 
+        IEnumerable<HexaTile> LoadSelectedTiles() => 
             selectedTilesRepository.Load();
     }
 }

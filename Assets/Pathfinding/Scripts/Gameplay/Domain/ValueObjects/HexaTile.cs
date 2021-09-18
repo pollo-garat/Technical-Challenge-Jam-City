@@ -23,6 +23,8 @@ namespace Pathfinding.Scripts.Gameplay.Domain.ValueObjects
         public static HexaTile SetTileInCoordinates(HexaTile tile, int x, int y) => 
             new HexaTile(tile.Configuration, x, y);
 
+        public TileType Type() => Configuration.Type;
+
         public override string ToString() =>
             $"Configuration: {Configuration.ToString()} Coordinate X: {X}, Coordinate Y: {Y}";
         
