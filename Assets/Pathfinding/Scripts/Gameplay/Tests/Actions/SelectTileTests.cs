@@ -64,5 +64,19 @@ namespace Pathfinding.Scripts.Gameplay.Tests.Actions
             
             Assert.AreEqual(expectedTileSelected, selectedTiles);
         }
+        
+        [Test]
+        public void SameTileCanNotBeSelectedAtTheSameTime()
+        {
+            var initialTile = AHexaTile(2, 3);
+            var tileSelected = AHexaTile(2, 3);
+            var expectedTileSelected = new[] {initialTile};
+            var selectedTilesRepository = new InMemorySelectedTilesRepository(new []{initialTile});
+            var selectTiles = new SelectTiles(selectedTilesRepository);
+
+            var selectedTiles = selectTiles.Do(tileSelected);
+            
+            Assert.AreEqual(expectedTileSelected, selectedTiles);
+        }
     }
 }

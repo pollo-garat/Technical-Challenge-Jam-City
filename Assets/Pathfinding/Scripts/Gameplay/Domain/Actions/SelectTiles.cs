@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Pathfinding.Scripts.Gameplay.Domain.Repositories;
@@ -13,9 +14,12 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Actions
             this.selectedTilesRepository = selectedTilesRepository;
 
         public IEnumerable<HexaTile> Do(HexaTile tileSelected) => 
-            tileSelected.Type() != TileType.Water ? 
+            tileSelected.Type() != TileType.Water && LoadSelectedTiles().All(AreDistinct(tileSelected)) ? 
                 selectedTilesRepository.Save(LoadSelectedTiles().Concat(new[] {tileSelected})) : 
                 LoadSelectedTiles();
+
+        static Func<HexaTile, bool> AreDistinct(HexaTile tileSelected) => 
+            tile => tile.X != tileSelected.X && tile.Y != tileSelected.Y;
 
         IEnumerable<HexaTile> LoadSelectedTiles() => 
             selectedTilesRepository.Load();

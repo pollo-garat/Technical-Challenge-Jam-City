@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Pathfinding.Scripts.Gameplay.Domain.Services;
 using Pathfinding.Scripts.Gameplay.Domain.ValueObjects;
 using UniRx;
 using UnityEngine;
@@ -33,10 +34,12 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
         Vector3 startPosition;
         HexaTile[,] grid;
         UnityHexaTile[,] unityGird;
+        GridNeighbours girdNeighbours;
 
-        public void CreateGrid(HexaTile[,] grid)
+        public void CreateGrid(HexaTile[,] grid, GridNeighbours girdNeighbours)
         {
             this.grid = grid;
+            this.girdNeighbours = girdNeighbours;
             unityGird = new UnityHexaTile[GridWidth, GridHeight];
             AddGap();
             CalculateStartPosition();
@@ -71,6 +74,18 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
                     .GetComponent<UnityHexaTile>().SetNewMaterial(NeighbourMaterial);
             }
         }
+
+        public void FindPath(IEnumerable<HexaTile> selectedTiles)
+        {
+            if (StartAndEndTileAre(selectedTiles))
+            {
+                var startingTile = selectedTiles.First();
+                var endTile = selectedTiles.Last();
+            }
+        }
+
+        static bool StartAndEndTileAre(IEnumerable<HexaTile> selectedTiles) => 
+            selectedTiles.Count() > 1;
 
         void SetTileMaterial(GameObject hex, TileType type)
         {

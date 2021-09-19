@@ -28,22 +28,32 @@ namespace Pathfinding.Scripts.Gameplay.Domain
                 MountainConfiguration,
                 WaterConfiguration
             );
+            
+            var inMemorySelectedTilesRepository = new InMemorySelectedTilesRepository();
+            
             var gridService = new GridService(randomTileService);
             var girdNeighbours = new GridNeighbours(WorldGrid.GridWidth, WorldGrid.GridHeight);
+            
             var startGame = new StartGame(gridService);
-
+            var selectTiles = new SelectTiles(inMemorySelectedTilesRepository);
+            
             var domainGrid = startGame.Do(WorldGrid.GridWidth, WorldGrid.GridHeight);
 
-            WorldGrid.CreateGrid(domainGrid);
+            WorldGrid.CreateGrid(domainGrid, girdNeighbours);
 
+            // WorldGrid.OnTileClicked
+            //     .Select(hexaTile => girdNeighbours.ValidNeighbours(hexaTile))
+            //     .Do(neighbours => Debug.Log(string.Join(" ", neighbours.Select(x => x.ToString()))))
+            //     .Do(neighbours =>
+            //     {
+            //         if(WorldGrid.DebugMode)
+            //             WorldGrid.PaintNeighbours(neighbours);
+            //     })
+            //     .Subscribe();
+            
             WorldGrid.OnTileClicked
-                .Select(hexaTile => girdNeighbours.ValidNeighbours(hexaTile))
-                .Do(neighbours => Debug.Log(string.Join(" ", neighbours.Select(x => x.ToString()))))
-                .Do(neighbours =>
-                {
-                    if(WorldGrid.DebugMode)
-                        WorldGrid.PaintNeighbours(neighbours);
-                })
+                .Select(hexaTile => selectTiles.Do(hexaTile))
+                .Do(selectedTiles => WorldGrid.FindPath(selectedTiles))
                 .Subscribe();
         }
     }
