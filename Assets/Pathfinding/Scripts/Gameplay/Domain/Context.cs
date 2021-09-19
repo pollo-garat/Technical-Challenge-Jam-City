@@ -53,6 +53,7 @@ namespace Pathfinding.Scripts.Gameplay.Domain
             
             WorldGrid.OnTileClicked
                 .Select(hexaTile => selectTiles.Do(hexaTile))
+                .Do(_ => Debug.Log(_.Count()))
                 .Do(selectedTiles => WorldGrid.FindPath(selectedTiles))
                 .Subscribe();
         }

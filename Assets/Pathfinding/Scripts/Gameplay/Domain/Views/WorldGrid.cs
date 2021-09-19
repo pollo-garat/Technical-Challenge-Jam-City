@@ -35,6 +35,9 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
         HexaTile[,] grid;
         UnityHexaTile[,] unityGird;
         GridNeighbours girdNeighbours;
+        
+        List<UnityHexaTile> openList = new List<UnityHexaTile>();
+        List<UnityHexaTile> closeList = new List<UnityHexaTile>();
 
         public void CreateGrid(HexaTile[,] grid, GridNeighbours girdNeighbours)
         {
@@ -77,12 +80,109 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
 
         public void FindPath(IEnumerable<HexaTile> selectedTiles)
         {
-            if (StartAndEndTileAre(selectedTiles))
+            if (!StartAndEndTileAre(selectedTiles)) return;
+            
+            var startingTile = selectedTiles.First();
+            var endTile = selectedTiles.Last();
+
+            var startNode = GetObjectFromGrid(startingTile);
+            var endNode = GetObjectFromGrid(endTile);
+                
+            openList = new List<UnityHexaTile> { startNode };
+            closeList = new List<UnityHexaTile>();
+
+            foreach (var tile in unityGird)
             {
-                var startingTile = selectedTiles.First();
-                var endTile = selectedTiles.Last();
+                tile.GCost = int.MaxValue;
+                tile.CalculateFCost();
+                tile.CameFromNode = null;
+            }
+                
+            startNode.GCost = 0;
+            startNode.HCost = CalculateDistanceCost(startNode, endNode);
+            startNode.CalculateFCost();
+
+            while (openList.Count > 0)
+            {
+                var currentNode = GetLowestFCost(openList);
+
+                if (currentNode == endNode)
+                {
+                    foreach (var tile in RetrievePath(endNode)) 
+                        tile.SetNewMaterial(NeighbourMaterial);
+                    return;
+                }
+
+                openList.Remove(currentNode);
+                closeList.Add(currentNode);
+
+                foreach (var neighbourNode in GetNeighbours(currentNode))
+                {
+                    if(closeList.Contains(neighbourNode))
+                        continue;
+
+                    var tentativeGCost = currentNode.GCost + CalculateDistanceCost(currentNode, neighbourNode);
+                    
+                    if (tentativeGCost < neighbourNode.GCost && neighbourNode.HexaTile.Configuration.IsWalkable)
+                    {
+                        neighbourNode.CameFromNode = currentNode;
+                        neighbourNode.GCost = tentativeGCost;
+                        neighbourNode.HCost = CalculateDistanceCost(neighbourNode, endNode);
+                        neighbourNode.CalculateFCost();
+                            
+                        if(!openList.Contains(neighbourNode))
+                            openList.Add(neighbourNode);
+                    }
+                }
             }
         }
+
+        static int CalculateDistanceCost(UnityHexaTile startNode, UnityHexaTile endNode)
+        {
+            var xDistance = Mathf.Abs(startNode.HexaTile.X - endNode.HexaTile.X);
+            var yDistance = Mathf.Abs(startNode.HexaTile.Y - endNode.HexaTile.Y);
+            var remaining = Mathf.Abs(xDistance - yDistance);
+
+            return 10 * Mathf.Min(xDistance, yDistance) + 14 * remaining;
+        }
+
+        static IEnumerable<UnityHexaTile> RetrievePath(UnityHexaTile endNode)
+        {
+            var path = new List<UnityHexaTile> {endNode};
+            var currentNode = endNode;
+            
+            while (currentNode.CameFromNode != null)
+            {
+                path.Add(currentNode.CameFromNode);
+                currentNode = currentNode.CameFromNode;
+            }
+
+            path.Reverse();
+            return path;
+        }
+
+        IEnumerable<UnityHexaTile> GetNeighbours(UnityHexaTile tile) => 
+            girdNeighbours.ValidNeighbours(tile.HexaTile)
+                .Select(neighbour => GetObjectFromGrid(neighbour));
+
+        static UnityHexaTile GetLowestFCost(IReadOnlyList<UnityHexaTile> readyForSearchTiles)
+        {
+            var lowestFCost = readyForSearchTiles[0];
+
+            for (var i = 1; i < readyForSearchTiles.Count; i++)
+            {
+                if (readyForSearchTiles[i].FCost < lowestFCost.FCost) 
+                    lowestFCost = readyForSearchTiles[i];
+            }
+
+            return lowestFCost;
+        }
+        
+        UnityHexaTile GetObjectFromGrid(HexaTile tile) => 
+            unityGird[tile.X, tile.Y];
+        
+        UnityHexaTile GetObjectFromGrid((int x, int y) coordinates) => 
+            unityGird[coordinates.x, coordinates.y];
 
         static bool StartAndEndTileAre(IEnumerable<HexaTile> selectedTiles) => 
             selectedTiles.Count() > 1;

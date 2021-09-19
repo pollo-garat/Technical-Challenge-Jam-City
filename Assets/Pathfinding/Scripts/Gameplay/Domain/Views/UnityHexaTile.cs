@@ -8,14 +8,20 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
     public class UnityHexaTile : MonoBehaviour
     {
         public IObservable<HexaTile> OnTileClicked => onTileClicked;
+        public UnityHexaTile CameFromNode;
+        public int GCost;
+        public int HCost;
+        public int FCost;
+        public HexaTile HexaTile { get; private set; }
 
         readonly ISubject<HexaTile> onTileClicked = new Subject<HexaTile>();
-        HexaTile hexaTile;
         Material initialMaterial;
         Material newMaterial;
 
+        public void CalculateFCost() => FCost = GCost + HCost;
+
         public void Populate(HexaTile hexaTile) => 
-            this.hexaTile = hexaTile;
+            HexaTile = hexaTile;
 
         public void SetInitialMaterial(Material initialMaterial)
         {
@@ -34,6 +40,6 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
         void SetMaterial(Material material) => 
             GetComponentInChildren<MeshRenderer>().sharedMaterial = material;
 
-        void OnMouseDown() => onTileClicked.OnNext(hexaTile);
+        void OnMouseDown() => onTileClicked.OnNext(HexaTile);
     }
 }
