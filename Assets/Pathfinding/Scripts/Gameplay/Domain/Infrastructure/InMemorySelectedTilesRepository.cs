@@ -17,5 +17,8 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Infrastructure
 
         public IEnumerable<HexaTile> Save(IEnumerable<HexaTile> selectedTiles) =>
             this.selectedTiles = selectedTiles;
+
+        public void Clear() => 
+            selectedTiles = Enumerable.Empty<HexaTile>();
     }
 }

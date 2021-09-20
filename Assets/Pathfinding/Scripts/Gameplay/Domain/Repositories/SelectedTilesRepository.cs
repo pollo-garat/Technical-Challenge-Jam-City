@@ -7,5 +7,6 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Repositories
     {
         IEnumerable<HexaTile> Load();
         IEnumerable<HexaTile> Save(IEnumerable<HexaTile> selectedTiles);
+        void Clear();
     }
 }

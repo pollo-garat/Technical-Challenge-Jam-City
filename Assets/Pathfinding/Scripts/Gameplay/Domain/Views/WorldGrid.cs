@@ -25,8 +25,8 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
         public Material MountainMaterial;
         public Material WaterMaterial;
         public Material NeighbourMaterial;
-
-        public bool DebugMode;
+        public Material PathMaterial;
+        public Material HighlightMaterial;
         
         float hexWidth = 1f;
         float hexHeight = 1f;
@@ -68,8 +68,7 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
 
         public void PaintNeighbours(IEnumerable<(int, int)> neighbours)
         {
-            foreach (var unityTile in unityGird) 
-                unityTile.ResetMaterial();
+            ResetMapGraphics();
 
             foreach (var neighbour in neighbours)
             {
@@ -78,10 +77,14 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
             }
         }
 
+        public void ResetMapGraphics()
+        {
+            foreach (var unityTile in unityGird) 
+                unityTile.ResetMaterial(); 
+        }
+
         public void FindPath(IEnumerable<HexaTile> selectedTiles)
         {
-            if (!StartAndEndTileAre(selectedTiles)) return;
-            
             var startingTile = selectedTiles.First();
             var endTile = selectedTiles.Last();
 
@@ -108,8 +111,10 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
 
                 if (currentNode == endNode)
                 {
-                    foreach (var tile in RetrievePath(endNode)) 
-                        tile.SetNewMaterial(NeighbourMaterial);
+                    var path = RetrievePath(endNode);
+
+                    foreach (var tile in path.Skip(1).Take(path.Count() - 2)) 
+                        tile.SetNewMaterial(PathMaterial);
                     return;
                 }
 
@@ -136,6 +141,9 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
                 }
             }
         }
+
+        public void HighlightTile(HexaTile tile) => 
+            GetObjectFromGrid(tile).SetNewMaterial(HighlightMaterial);
 
         static int CalculateDistanceCost(UnityHexaTile startNode, UnityHexaTile endNode)
         {
@@ -183,10 +191,7 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
         
         UnityHexaTile GetObjectFromGrid((int x, int y) coordinates) => 
             unityGird[coordinates.x, coordinates.y];
-
-        static bool StartAndEndTileAre(IEnumerable<HexaTile> selectedTiles) => 
-            selectedTiles.Count() > 1;
-
+        
         void SetTileMaterial(GameObject hex, TileType type)
         {
             var unityHexaTile = hex.GetComponent<UnityHexaTile>();

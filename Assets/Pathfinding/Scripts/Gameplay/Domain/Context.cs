@@ -12,7 +12,8 @@ namespace Pathfinding.Scripts.Gameplay.Domain
     public class Context : MonoBehaviour
     {
         public WorldGrid WorldGrid;
-        
+        public bool DebugNeighbours;
+
         void Start()
         {
             var GrassConfiguration = new HexaTileConfiguration(TileType.Grass, 1, true);
@@ -36,25 +37,33 @@ namespace Pathfinding.Scripts.Gameplay.Domain
             
             var startGame = new StartGame(gridService);
             var selectTiles = new SelectTiles(inMemorySelectedTilesRepository);
+            var resetTiles = new ResetTiles(inMemorySelectedTilesRepository);
             
             var domainGrid = startGame.Do(WorldGrid.GridWidth, WorldGrid.GridHeight);
 
             WorldGrid.CreateGrid(domainGrid, girdNeighbours);
 
-            // WorldGrid.OnTileClicked
-            //     .Select(hexaTile => girdNeighbours.ValidNeighbours(hexaTile))
-            //     .Do(neighbours => Debug.Log(string.Join(" ", neighbours.Select(x => x.ToString()))))
-            //     .Do(neighbours =>
-            //     {
-            //         if(WorldGrid.DebugMode)
-            //             WorldGrid.PaintNeighbours(neighbours);
-            //     })
-            //     .Subscribe();
+            var onTileClicked = WorldGrid.OnTileClicked.Share();
             
-            WorldGrid.OnTileClicked
+            onTileClicked
+                .Where(_ => DebugNeighbours)
+                .Select(hexaTile => girdNeighbours.ValidNeighbours(hexaTile))
+                .Do(neighbours => WorldGrid.PaintNeighbours(neighbours))
+                .Subscribe();
+            
+            onTileClicked
+                .Do(WorldGrid.HighlightTile)
                 .Select(hexaTile => selectTiles.Do(hexaTile))
-                .Do(_ => Debug.Log(_.Count()))
-                .Do(selectedTiles => WorldGrid.FindPath(selectedTiles))
+                .Do(selectedTiles =>
+                {
+                    if (selectedTiles.Count() > 2)
+                    {
+                        WorldGrid.ResetMapGraphics();
+                        resetTiles.Do();
+                    }
+                    else if (selectedTiles.Count() > 1) 
+                        WorldGrid.FindPath(selectedTiles);
+                })
                 .Subscribe();
         }
     }

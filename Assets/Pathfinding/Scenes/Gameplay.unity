@@ -246,6 +246,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   WorldGrid: {fileID: 1023780196294399066}
+  DebugMode: 0
 --- !u!4 &33467134
 Transform:
   m_ObjectHideFlags: 0
