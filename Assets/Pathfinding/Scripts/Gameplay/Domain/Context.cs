@@ -52,8 +52,8 @@ namespace Pathfinding.Scripts.Gameplay.Domain
                 .Subscribe();
             
             onTileClicked
-                .Do(WorldGrid.HighlightTile)
                 .Select(hexaTile => selectTiles.Do(hexaTile))
+                .Do(WorldGrid.HighlightTile)
                 .Do(selectedTiles =>
                 {
                     if (selectedTiles.Count() > 2)

@@ -18,10 +18,12 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
         Material initialMaterial;
         Material newMaterial;
 
-        public void CalculateFCost() => FCost = GCost + HCost;
+        public int GetCost => HexaTile.Configuration.Cost;
 
         public void Populate(HexaTile hexaTile) => 
             HexaTile = hexaTile;
+
+        public void CalculateFCost() => FCost = GCost + HCost;
 
         public void SetInitialMaterial(Material initialMaterial)
         {
