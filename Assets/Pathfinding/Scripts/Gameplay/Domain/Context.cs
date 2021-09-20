@@ -12,6 +12,7 @@ namespace Pathfinding.Scripts.Gameplay.Domain
     public class Context : MonoBehaviour
     {
         public WorldGrid WorldGrid;
+        public AStartPathFinder PathFinder;
         public bool DebugNeighbours;
 
         void Start()
@@ -42,27 +43,28 @@ namespace Pathfinding.Scripts.Gameplay.Domain
             var domainGrid = startGame.Do(WorldGrid.GridWidth, WorldGrid.GridHeight);
 
             WorldGrid.CreateGrid(domainGrid, girdNeighbours);
+            PathFinder.Initialize(WorldGrid.GetUnityGrid(), girdNeighbours);
 
             var onTileClicked = WorldGrid.OnTileClicked.Share();
             
             onTileClicked
                 .Where(_ => DebugNeighbours)
                 .Select(hexaTile => girdNeighbours.ValidNeighbours(hexaTile))
-                .Do(neighbours => WorldGrid.PaintNeighbours(neighbours))
+                .Do(neighbours => PathFinder.PaintNeighbours(neighbours))
                 .Subscribe();
             
             onTileClicked
                 .Select(hexaTile => selectTiles.Do(hexaTile))
-                .Do(WorldGrid.HighlightTile)
+                .Do(PathFinder.HighlightTile)
                 .Do(selectedTiles =>
                 {
                     if (selectedTiles.Count() > 2)
                     {
-                        WorldGrid.ResetMapGraphics();
+                        PathFinder.ResetMapGraphics();
                         resetTiles.Do();
                     }
                     else if (selectedTiles.Count() > 1) 
-                        WorldGrid.FindPath(selectedTiles);
+                        PathFinder.FindPath(selectedTiles);
                 })
                 .Subscribe();
         }
