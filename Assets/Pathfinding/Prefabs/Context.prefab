@@ -93,6 +93,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   WorldGrid: {fileID: 8217101132237205739}
   PathFinder: {fileID: 719070730240432847}
+  GrassCost: 1
+  ForestCost: 3
+  DesertCost: 5
+  MountainCost: 10
   DebugNeighbours: 0
 --- !u!1001 &6713331431352178356
 PrefabInstance:

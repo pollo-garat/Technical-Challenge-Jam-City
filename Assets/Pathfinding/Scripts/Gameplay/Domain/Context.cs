@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Pathfinding.Scripts.Gameplay.Domain.Actions;
 using Pathfinding.Scripts.Gameplay.Domain.Infrastructure;
@@ -13,14 +14,20 @@ namespace Pathfinding.Scripts.Gameplay.Domain
     {
         public WorldGrid WorldGrid;
         public AStartPathFinder PathFinder;
+        public int GrassCost;
+        public int ForestCost;
+        public int DesertCost;
+        public int MountainCost;
         public bool DebugNeighbours;
+        
+        ResetTiles resetTiles;
 
         void Start()
         {
-            var GrassConfiguration = new HexaTileConfiguration(TileType.Grass, 1, true);
-            var ForestConfiguration = new HexaTileConfiguration(TileType.Forest, 3, true);
-            var DesertConfiguration = new HexaTileConfiguration(TileType.Desert, 5, true);
-            var MountainConfiguration = new HexaTileConfiguration(TileType.Mountain, 10, true);
+            var GrassConfiguration = new HexaTileConfiguration(TileType.Grass, GrassCost, true);
+            var ForestConfiguration = new HexaTileConfiguration(TileType.Forest, ForestCost, true);
+            var DesertConfiguration = new HexaTileConfiguration(TileType.Desert, DesertCost, true);
+            var MountainConfiguration = new HexaTileConfiguration(TileType.Mountain, MountainCost, true);
             var WaterConfiguration = new HexaTileConfiguration(TileType.Water, 0, false);
             
             var randomTileService = new UnityRandomTileService(
@@ -38,7 +45,7 @@ namespace Pathfinding.Scripts.Gameplay.Domain
             
             var startGame = new StartGame(gridService);
             var selectTiles = new SelectTiles(inMemorySelectedTilesRepository);
-            var resetTiles = new ResetTiles(inMemorySelectedTilesRepository);
+            resetTiles = new ResetTiles(inMemorySelectedTilesRepository);
             
             var domainGrid = startGame.Do(WorldGrid.GridWidth, WorldGrid.GridHeight);
 
@@ -49,24 +56,40 @@ namespace Pathfinding.Scripts.Gameplay.Domain
             
             onTileClicked
                 .Where(_ => DebugNeighbours)
-                .Select(hexaTile => girdNeighbours.ValidNeighbours(hexaTile))
-                .Do(neighbours => PathFinder.PaintNeighbours(neighbours))
+                .Select(girdNeighbours.ValidNeighbours)
+                .Do(PathFinder.PaintNeighbours)
                 .Subscribe();
             
             onTileClicked
-                .Select(hexaTile => selectTiles.Do(hexaTile))
+                .Select(selectTiles.Do)
                 .Do(PathFinder.HighlightTile)
-                .Do(selectedTiles =>
-                {
-                    if (selectedTiles.Count() > 2)
-                    {
-                        PathFinder.ResetMapGraphics();
-                        resetTiles.Do();
-                    }
-                    else if (selectedTiles.Count() > 1) 
-                        PathFinder.FindPath(selectedTiles);
-                })
+                .SelectMany(selectedTiles => 
+                    PathAlreadyFound(selectedTiles) ? ResetMap() :
+                    PathNotFound(selectedTiles) ? FindPath(selectedTiles) :
+                    _
+                )
                 .Subscribe();
         }
+
+        static bool PathNotFound(IEnumerable<HexaTile> selectedTiles) => 
+            selectedTiles.Count() > 1;
+
+        static bool PathAlreadyFound(IEnumerable<HexaTile> selectedTiles) => 
+            selectedTiles.Count() > 2;
+
+        IEnumerable<HexaTile> ResetMap()
+        {
+            PathFinder.ResetMapGraphics();
+            resetTiles.Do();
+            return _;
+        }
+
+        IEnumerable<HexaTile> FindPath(IEnumerable<HexaTile> selectedTiles)
+        {
+            PathFinder.FindPath(selectedTiles);
+            return _;
+        }
+
+        static IEnumerable<HexaTile> _ => Enumerable.Empty<HexaTile>();
     }
 }

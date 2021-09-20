@@ -7,10 +7,8 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Actions
     {
         readonly GridService gridService;
 
-        public StartGame(GridService gridService)
-        {
+        public StartGame(GridService gridService) => 
             this.gridService = gridService;
-        }
 
         public HexaTile[,] Do(int gridRows, int gridCols) => 
             gridService.Create(gridRows, gridCols);

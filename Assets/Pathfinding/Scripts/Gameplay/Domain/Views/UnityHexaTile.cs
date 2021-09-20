@@ -20,6 +20,8 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
 
         public int GetCost => HexaTile.Configuration.Cost;
 
+        public bool IsWalkable => HexaTile.Configuration.IsWalkable;
+
         public void Populate(HexaTile hexaTile) => 
             HexaTile = hexaTile;
 

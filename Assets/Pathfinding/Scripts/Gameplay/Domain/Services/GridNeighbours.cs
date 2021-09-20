@@ -6,7 +6,7 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Services
 {
     public class GridNeighbours
     {
-        public readonly int MaxX;
+        readonly int MaxX;
         readonly int MaxYEven;
         readonly int MaxYOdd;
         

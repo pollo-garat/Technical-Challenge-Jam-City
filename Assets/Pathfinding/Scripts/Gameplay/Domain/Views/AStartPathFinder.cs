@@ -8,6 +8,9 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
 {
     public class AStartPathFinder : MonoBehaviour
     {
+        const int RecommendedHorizontalCost = 10;
+        const int RecommendedDiagonalCost = 14;
+        
         public Material PathMaterial;
         public Material HighlightMaterial;
         public Material NeighbourMaterial;
@@ -54,7 +57,7 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
                 {
                     var path = RetrievePath(endNode);
 
-                    foreach (var tile in path.Skip(1).Take(path.Count() - 2)) 
+                    foreach (var tile in PathWithoutFirstAndLastTile(path)) 
                         tile.SetNewMaterial(PathMaterial);
                     return;
                 }
@@ -69,7 +72,7 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
 
                     var tentativeGCost = currentNode.GCost + CalculateDistanceCost(currentNode, neighbourNode);
                     
-                    if (tentativeGCost < neighbourNode.GCost && neighbourNode.HexaTile.Configuration.IsWalkable)
+                    if (tentativeGCost < neighbourNode.GCost && neighbourNode.IsWalkable)
                     {
                         neighbourNode.CameFromNode = currentNode;
                         neighbourNode.GCost = tentativeGCost;
@@ -82,16 +85,17 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
                 }
             }
         }
-        
+
+        static IEnumerable<UnityHexaTile> PathWithoutFirstAndLastTile(IEnumerable<UnityHexaTile> path) => 
+            path.Skip(1).Take(path.Count() - 2);
+
         public void PaintNeighbours(IEnumerable<(int, int)> neighbours)
         {
             ResetMapGraphics();
 
-            foreach (var neighbour in neighbours)
-            {
-                unityGird[neighbour.Item1, neighbour.Item2]
+            foreach (var (x, y) in neighbours)
+                unityGird[x, y]
                     .GetComponent<UnityHexaTile>().SetNewMaterial(NeighbourMaterial);
-            }
         }
         
         public void HighlightTile(IEnumerable<HexaTile> tiles)
@@ -112,7 +116,8 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
             var yDistance = Mathf.Abs(startNode.HexaTile.Y - endNode.HexaTile.Y);
             var remaining = Mathf.Abs(xDistance - yDistance);
 
-            return startNode.GetCost * 10 * Mathf.Min(xDistance, yDistance) + endNode.GetCost * 14 * remaining;
+            return startNode.GetCost * RecommendedHorizontalCost * Mathf.Min(xDistance, yDistance) + 
+                   endNode.GetCost * RecommendedDiagonalCost * remaining;
         }
 
         static IEnumerable<UnityHexaTile> RetrievePath(UnityHexaTile endNode)
@@ -146,7 +151,7 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Views
 
             return lowestFCost;
         }
-        
+
         UnityHexaTile GetObjectFromGrid((int x, int y) coordinates) => 
             unityGird[coordinates.x, coordinates.y];
 

@@ -7,11 +7,9 @@ namespace Pathfinding.Scripts.Gameplay.Domain.Services
     {
         readonly RandomTileService randomTileService;
 
-        public GridService(RandomTileService randomTileService)
-        {
+        public GridService(RandomTileService randomTileService) => 
             this.randomTileService = randomTileService;
-        }
-        
+
         public HexaTile[,] Create(int gridRows, int gridCols)
         {
             var grid = new HexaTile[gridRows, gridCols];
